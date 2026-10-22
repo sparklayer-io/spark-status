@@ -220,7 +220,18 @@ const affectedNames = (i, services) =>
 const pill = level => `<span class="pill pill-${level}"><span class="dot"></span>${LEVELS[level].word}</span>`;
 const stateTag = s => `<span class="state state-${s.toLowerCase()}">${esc(s)}</span>`;
 
-function page({ title, description, body, root = '' }) {
+/** The site's address, for link previews (they need absolute URLs). On Vercel
+ *  it's the project's production domain; SITE_URL overrides. */
+export const siteUrl = () =>
+  (
+    process.env.SITE_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : 'https://status.sparklayer.io')
+  ).replace(/\/$/, '');
+
+function page({ title, description, body, root = '', path = '/' }) {
+  const site = siteUrl();
   return `<!doctype html>
 <html lang="en-GB">
 <head>
@@ -228,7 +239,18 @@ function page({ title, description, body, root = '' }) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
-<link rel="icon" href="${root}favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="${site}${path}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SparkLayer Status">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(description)}">
+<meta property="og:url" content="${site}${path}">
+<meta property="og:image" content="${site}/og-image.jpg">
+<meta property="og:image:width" content="1114">
+<meta property="og:image:height" content="585">
+<meta property="og:image:alt" content="SparkLayer System Status, status.sparklayer.io">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="${root}favicon.ico" sizes="any">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
@@ -385,5 +407,6 @@ ${i.updates
     description: i.open ? `Ongoing: ${i.title}. Updates from SparkLayer.` : `Resolved: ${i.title}.`,
     body,
     root: '../../',
+    path: `/incidents/${i.slug}/`,
   });
 }

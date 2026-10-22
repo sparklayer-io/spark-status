@@ -23,7 +23,7 @@ for (const p of ['incidents', 'public', 'scripts', 'services.json'])
     clearTimeout(t);
     t = setTimeout(rebuild, 150);
   });
-const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml' };
+const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon' };
 createServer((req, res) => {
   let p = join(root, 'dist', decodeURIComponent(new URL(req.url, 'http://x').pathname));
   if (existsSync(p) && statSync(p).isDirectory()) p = join(p, 'index.html');
