@@ -234,7 +234,7 @@ export const siteUrl = () =>
 const PREVIEW = {
   title: 'SparkLayer Status',
   description:
-    'Live status for SparkLayer. See whether your B2B store, Dashboard and API are working, with updates on any issues.',
+    'Check the latest operational status of SparkLayer, including service availability, scheduled maintenance and incident updates.',
 };
 
 function page({ title, body, root = '', path = '/' }) {
