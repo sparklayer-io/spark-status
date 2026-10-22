@@ -76,8 +76,19 @@ npm test
 ```
 
 Node 20+, no dependencies. `services.json` holds the three services' names and
-descriptions. The build also writes `dist/status.json` (overall status, each
-service, open incidents) for other tools to read.
+descriptions.
+
+The build also writes, all from the same incident files:
+
+- `status.json`: overall status, each service and open incidents, for other tools.
+- `feed.xml`: an Atom feed of every update (follow it in a feed reader or Slack's RSS app).
+- `llms.txt`: the current status and latest update in plain Markdown, for AI assistants.
+- `sitemap.xml`, `robots.txt` and `404.html`; every page carries structured data
+  (schema.org Organization, WebSite/WebPage, and Article + breadcrumbs per incident).
+
+Links use the production domain (Vercel's `VERCEL_PROJECT_PRODUCTION_URL`, or
+`SITE_URL`), and the `*.vercel.app` address is marked `noindex` so search engines
+only list status.sparklayer.io.
 
 ## Hosting
 

@@ -66,6 +66,12 @@ h3 {
   padding-top: 26px;
   padding-bottom: 26px;
 }
+.brand-heading {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: normal;
+}
 .brand {
   display: inline-flex;
   align-items: center;
@@ -153,7 +159,7 @@ svg {
   border: 1px solid;
   box-shadow: var(--shadow);
 }
-.hero h1 {
+.hero h2 {
   font-size: 18px;
   line-height: 1.4;
   font-weight: 600;
@@ -585,7 +591,7 @@ code {
     width: 24px;
     height: 24px;
   }
-  .hero h1,
+  .hero h2,
   .incident-head h1 {
     font-size: 17px;
   }

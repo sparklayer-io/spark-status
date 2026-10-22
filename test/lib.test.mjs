@@ -1,6 +1,16 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { md, overall, parseIncident, serviceStatus, ukTime } from '../scripts/lib.mjs';
+import {
+  md,
+  overall,
+  parseIncident,
+  plainText,
+  renderFeed,
+  renderLlms,
+  renderSitemap,
+  serviceStatus,
+  ukTime,
+} from '../scripts/lib.mjs';
 
 const services = [
   { id: 'frontend', name: 'SparkLayer Frontend', description: '' },
@@ -71,4 +81,19 @@ test('update text: escaped, with bold, lists and safe links only', () => {
   assert.match(h, /<ul><li>one<\/li><li>two<\/li><\/ul>/);
   assert.match(h, /<a href="https:\/\/www.ncsc.gov.uk" target="_blank" rel="noopener noreferrer">NCSC<\/a>/);
   assert.doesNotMatch(h, /href="javascript/);
+});
+
+test('search and AI files: sitemap, feed and llms.txt say what the page says', () => {
+  const open = parseIncident(file('title: Down\nimpact: major\naffects: [frontend]', '## 2026-10-22 09:00 · Identified\nEmail [support@sparklayer.io](mailto:support@sparklayer.io) or see [NCSC](https://www.ncsc.gov.uk).'), 'down', ids);
+  const sitemap = renderSitemap({ incidents: [open] });
+  assert.match(sitemap, /<loc>https:\/\/[^<]+\/incidents\/down\/<\/loc><lastmod>2026-10-22T08:00:00.000Z<\/lastmod>/);
+  const feed = renderFeed({ incidents: [open] });
+  assert.match(feed, /<title>Identified: Down<\/title>/);
+  assert.doesNotMatch(feed, /<a href/); // update HTML is escaped inside the feed
+  const llms = renderLlms({ services, incidents: [open] });
+  assert.match(llms, /^# SparkLayer Status/);
+  assert.match(llms, /SparkLayer Frontend: Not working/);
+  assert.match(llms, /SparkLayer API: Working normally/);
+  assert.match(llms, /## Ongoing incidents\n\n### Down/);
+  assert.equal(plainText(open.updates[0].html), 'Email support@sparklayer.io or see NCSC (https://www.ncsc.gov.uk).');
 });

@@ -173,6 +173,14 @@ export function serviceStatus(services, incidents) {
   });
 }
 
+/** The headline: "temporarily unavailable" only when every service is down. */
+export function headlineFor(statuses) {
+  const level = overall(statuses);
+  return level === 'major' && statuses.every(s => s.level === 'major')
+    ? 'SparkLayer is temporarily unavailable'
+    : LEVELS[level].headline;
+}
+
 export function overall(statuses) {
   return statuses.some(s => s.level === 'major')
     ? 'major'
@@ -237,8 +245,20 @@ const PREVIEW = {
     'Check the latest operational status of SparkLayer, including service availability, scheduled maintenance and incident updates.',
 };
 
-function page({ title, body, root = '', path = '/' }) {
+/** SparkLayer, as structured data names it on every page. */
+const org = site => ({
+  '@type': 'Organization',
+  '@id': `${site}/#organization`,
+  name: 'SparkLayer',
+  url: 'https://www.sparklayer.io',
+  logo: `${site}/logo-dark.png`,
+  sameAs: ['https://www.sparklayer.io', 'https://docs.sparklayer.io'],
+});
+const ld = data => `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`;
+
+function page({ title, body, root = '', path = '/', home = false, jsonLd = [] }) {
   const site = siteUrl();
+  const brand = `<a class="brand" href="${root || './'}"><img src="${root}logo-dark.png" alt="SparkLayer" width="534" height="117"><span>Status</span></a>`;
   return `<!doctype html>
 <html lang="en-GB">
 <head>
@@ -246,7 +266,11 @@ function page({ title, body, root = '', path = '/' }) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(PREVIEW.description)}">
+<meta name="robots" content="${path === '/404' ? 'noindex' : 'index, follow, max-image-preview:large'}">
+<meta name="theme-color" content="#f7f6fc">
 <link rel="canonical" href="${site}${path}">
+<link rel="alternate" type="application/atom+xml" title="SparkLayer Status updates" href="${site}/feed.xml">
+<link rel="alternate" type="text/plain" title="SparkLayer Status for AI assistants" href="${site}/llms.txt">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SparkLayer Status">
 <meta property="og:title" content="${esc(PREVIEW.title)}">
@@ -262,11 +286,12 @@ function page({ title, body, root = '', path = '/' }) {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="${root}styles.css">
+${ld({ '@context': 'https://schema.org', '@graph': [org(site), ...jsonLd] })}
 </head>
 <body>
 <div class="bar" aria-hidden="true"></div>
 <header class="wrap top">
-  <a class="brand" href="${root || './'}"><img src="${root}logo-dark.png" alt="SparkLayer" width="534" height="117"><span>Status</span></a>
+  ${home ? `<h1 class="brand-heading">${brand}</h1>` : brand}
   <a class="help" href="https://docs.sparklayer.io/help/support"${NEW_TAB}>Contact support</a>
 </header>
 <main class="wrap">
@@ -315,16 +340,13 @@ export function renderHome({ services, incidents, now = new Date(), pastDays = 3
     .filter(i => !i.open && i.resolvedAt && now - i.resolvedAt < pastDays * 86400000)
     .sort((a, b) => b.resolvedAt - a.resolvedAt);
   const lastChange = incidents.flatMap(i => i.updates.map(u => u.at)).filter(Boolean).sort((a, b) => b - a)[0];
-  const headline =
-    level === 'major' && statuses.every(s => s.level === 'major')
-      ? 'SparkLayer is temporarily unavailable'
-      : LEVELS[level].headline;
+  const headline = headlineFor(statuses);
 
   const body = `
 <section class="hero hero-${level}">
   ${ICON[level]}
   <div>
-    <h1>${headline}</h1>
+    <h2>${headline}</h2>
     <p>${
       level === 'ok'
         ? 'All SparkLayer services are working as expected.'
@@ -367,7 +389,29 @@ ${statuses
   }
 </section>`;
   return page({
-    title: level === 'ok' ? 'SparkLayer Status' : `${headline} · SparkLayer Status`,
+    title: level === 'ok' ? 'SparkLayer Status' : `SparkLayer Status · ${headline}`,
+    home: true,
+    jsonLd: [
+      {
+        '@type': 'WebSite',
+        '@id': `${siteUrl()}/#website`,
+        url: `${siteUrl()}/`,
+        name: 'SparkLayer Status',
+        description: PREVIEW.description,
+        publisher: { '@id': `${siteUrl()}/#organization` },
+        inLanguage: 'en-GB',
+      },
+      {
+        '@type': 'WebPage',
+        '@id': `${siteUrl()}/#webpage`,
+        url: `${siteUrl()}/`,
+        name: 'SparkLayer Status',
+        description: `${headline}. ${statuses.map(s => `${s.name}: ${LEVELS[s.level].word}`).join('. ')}.`,
+        isPartOf: { '@id': `${siteUrl()}/#website` },
+        about: { '@id': `${siteUrl()}/#organization` },
+        ...(lastChange ? { dateModified: lastChange.toISOString() } : {}),
+      },
+    ],
     body,
   });
 }
@@ -413,5 +457,183 @@ ${i.updates
     body,
     root: '../../',
     path: `/incidents/${i.slug}/`,
+    jsonLd: [
+      {
+        '@type': 'Article',
+        '@id': `${siteUrl()}/incidents/${i.slug}/#article`,
+        headline: i.title,
+        description: plainText(i.summary),
+        articleBody: i.updates.map(u => `${u.state} (${u.at?.toISOString()}): ${plainText(u.html)}`).join('\n\n'),
+        url: `${siteUrl()}/incidents/${i.slug}/`,
+        mainEntityOfPage: `${siteUrl()}/incidents/${i.slug}/`,
+        ...(i.started ? { datePublished: i.started.toISOString() } : {}),
+        ...(i.updates[0]?.at ? { dateModified: i.updates[0].at.toISOString() } : {}),
+        author: { '@id': `${siteUrl()}/#organization` },
+        publisher: { '@id': `${siteUrl()}/#organization` },
+        image: `${siteUrl()}/og-image.jpg`,
+        inLanguage: 'en-GB',
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'SparkLayer Status', item: `${siteUrl()}/` },
+          { '@type': 'ListItem', position: 2, name: i.title, item: `${siteUrl()}/incidents/${i.slug}/` },
+        ],
+      },
+    ],
+  });
+}
+
+// ── For search engines, feed readers and AI assistants ──────────────────────
+
+/** Rendered update HTML back to readable plain text (paragraphs, bullets, link targets). */
+export function plainText(html) {
+  return String(html)
+    .replace(/<a href="mailto:[^"]+"[^>]*>(.*?)<\/a>/g, '$1')
+    .replace(/<a href="([^"]+)"[^>]*>(.*?)<\/a>/g, '$2 ($1)')
+    .replace(/<li>/g, '- ')
+    .replace(/<\/(p|li|ul)>|<br>/g, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+const xml = s => esc(s);
+const lastUpdate = incidents =>
+  incidents.flatMap(i => i.updates.map(u => u.at)).filter(Boolean).sort((a, b) => b - a)[0] ?? null;
+
+export function renderRobots() {
+  return `# SparkLayer Status: everyone (search engines and AI assistants included) is welcome.
+User-agent: *
+Allow: /
+
+Sitemap: ${siteUrl()}/sitemap.xml
+`;
+}
+
+export function renderSitemap({ incidents, now = new Date() }) {
+  const site = siteUrl();
+  const urls = [
+    { loc: `${site}/`, lastmod: lastUpdate(incidents) ?? now },
+    ...incidents.map(i => ({ loc: `${site}/incidents/${i.slug}/`, lastmod: i.updates[0]?.at ?? now })),
+  ];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(u => `  <url><loc>${xml(u.loc)}</loc><lastmod>${u.lastmod.toISOString()}</lastmod></url>`).join('\n')}
+</urlset>
+`;
+}
+
+/** An Atom feed of every update, newest first: follow incidents in a feed reader or Slack. */
+export function renderFeed({ incidents, now = new Date() }) {
+  const site = siteUrl();
+  const entries = incidents
+    .flatMap(i => i.updates.filter(u => u.at).map(u => ({ i, u })))
+    .sort((a, b) => b.u.at - a.u.at)
+    .slice(0, 50);
+  return `<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>SparkLayer Status</title>
+  <subtitle>${xml(PREVIEW.description)}</subtitle>
+  <link href="${site}/" />
+  <link rel="self" href="${site}/feed.xml" />
+  <id>${site}/</id>
+  <updated>${(lastUpdate(incidents) ?? now).toISOString()}</updated>
+  <author><name>SparkLayer</name><uri>https://www.sparklayer.io</uri></author>
+  <icon>${site}/favicon.ico</icon>
+${entries
+  .map(
+    ({ i, u }) => `  <entry>
+    <title>${xml(`${u.state}: ${i.title}`)}</title>
+    <link href="${site}/incidents/${i.slug}/" />
+    <id>${site}/incidents/${i.slug}/#${u.at.toISOString()}</id>
+    <updated>${u.at.toISOString()}</updated>
+    <content type="html">${xml(u.html)}</content>
+  </entry>`,
+  )
+  .join('\n')}
+</feed>
+`;
+}
+
+/** llms.txt (llmstxt.org): the current status in plain Markdown, so an AI
+ *  assistant asked "is SparkLayer down?" can answer from the source. */
+export function renderLlms({ services, incidents, now = new Date(), pastDays = 30 }) {
+  const site = siteUrl();
+  const statuses = serviceStatus(services, incidents);
+  const open = incidents.filter(i => i.open).sort((a, b) => b.started - a.started);
+  const past = incidents
+    .filter(i => !i.open && i.resolvedAt && now - i.resolvedAt < pastDays * 86400000)
+    .sort((a, b) => b.resolvedAt - a.resolvedAt);
+  const t = d => (d ? `${UK.format(d)} (${d.toISOString()})` : 'unknown');
+  const lines = [
+    '# SparkLayer Status',
+    '',
+    '> The official status page for SparkLayer, the B2B ecommerce platform. It says whether SparkLayer’s storefront (Frontend), Dashboard and API are working, with updates from the SparkLayer team on any incident. Statuses are set by hand by SparkLayer staff.',
+    '',
+    `## Current status (as of ${t(lastUpdate(incidents) ?? now)})`,
+    '',
+    `**${headlineFor(statuses)}.**`,
+    '',
+    ...statuses.map(s => `- ${s.name}: ${LEVELS[s.level].word} (${s.description})`),
+    '',
+  ];
+  if (open.length) {
+    lines.push('## Ongoing incidents', '');
+    for (const i of open) {
+      const latest = i.updates[0];
+      lines.push(
+        `### ${i.title}`,
+        '',
+        `- Page: ${site}/incidents/${i.slug}/`,
+        `- Affects: ${affectedNames(i, services).join(', ')}`,
+        `- ${i.startedKnown ? 'Started' : 'First update'}: ${t(i.started)}`,
+        `- Latest update: ${latest?.state} at ${t(latest?.at)}`,
+        '',
+        plainText(i.summary),
+        '',
+        `Latest update (${latest?.state}, ${t(latest?.at)}):`,
+        '',
+        plainText(latest?.html ?? ''),
+        '',
+      );
+    }
+  }
+  lines.push(`## Recent incidents (last ${pastDays} days)`, '');
+  if (past.length)
+    for (const i of past) lines.push(`- [${i.title}](${site}/incidents/${i.slug}/): resolved ${t(i.resolvedAt)}`);
+  else lines.push('- None.');
+  lines.push(
+    '',
+    '## More',
+    '',
+    `- [Status page](${site}/): the same information for people`,
+    `- [status.json](${site}/status.json): machine-readable current status`,
+    `- [Updates feed](${site}/feed.xml): every update, as an Atom feed`,
+    '- [Contact SparkLayer support](https://docs.sparklayer.io/help/support)',
+    '- [SparkLayer](https://www.sparklayer.io) · [Help docs](https://docs.sparklayer.io)',
+    '',
+  );
+  return lines.join('\n');
+}
+
+export function render404() {
+  return page({
+    title: 'Page not found · SparkLayer Status',
+    root: '/',
+    path: '/404',
+    body: `
+<section class="hero hero-ok">
+  ${ICON.ok}
+  <div>
+    <h2>That page doesn’t exist</h2>
+    <p>It may have been an old incident link. <a href="/">See the current status of SparkLayer</a>.</p>
+  </div>
+</section>`,
   });
 }
