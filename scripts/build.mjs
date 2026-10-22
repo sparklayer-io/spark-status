@@ -4,7 +4,18 @@
 // a typo can't publish a broken page (Vercel keeps the last good one).
 import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { overall, parseIncident, renderHome, renderIncident, serviceStatus } from './lib.mjs';
+import {
+  overall,
+  parseIncident,
+  render404,
+  renderFeed,
+  renderHome,
+  renderIncident,
+  renderLlms,
+  renderRobots,
+  renderSitemap,
+  serviceStatus,
+} from './lib.mjs';
 
 const root = new URL('..', import.meta.url).pathname;
 const out = join(root, 'dist');
@@ -25,6 +36,11 @@ export function build({ now = new Date() } = {}) {
     mkdirSync(join(out, 'incidents', i.slug), { recursive: true });
     writeFileSync(join(out, 'incidents', i.slug, 'index.html'), renderIncident(i, { services, now }));
   }
+  writeFileSync(join(out, '404.html'), render404());
+  writeFileSync(join(out, 'robots.txt'), renderRobots());
+  writeFileSync(join(out, 'sitemap.xml'), renderSitemap({ incidents, now }));
+  writeFileSync(join(out, 'feed.xml'), renderFeed({ incidents, now }));
+  writeFileSync(join(out, 'llms.txt'), renderLlms({ services, incidents, now }));
   const statuses = serviceStatus(services, incidents);
   writeFileSync(
     join(out, 'status.json'),
