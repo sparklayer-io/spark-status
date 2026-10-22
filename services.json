@@ -1,0 +1,17 @@
+[
+  {
+    "id": "frontend",
+    "name": "SparkLayer Frontend",
+    "description": "Your B2B store as your customers see it: signing in, their prices, the quick order form, cart and checkout."
+  },
+  {
+    "id": "dashboard",
+    "name": "SparkLayer Dashboard",
+    "description": "Where your team manages customers, price lists, settings and orders."
+  },
+  {
+    "id": "api",
+    "name": "SparkLayer API",
+    "description": "How your ERP and other systems connect to SparkLayer: price, stock and order syncs."
+  }
+]
