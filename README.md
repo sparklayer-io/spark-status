@@ -41,8 +41,9 @@ Everything is working normally again. Thank you for your patience.
 ```
 
 In the same edit, put the **title and summary in the past tense** (they're
-what people see in "Recent incidents"), e.g. "SparkLayer was offline while we
-fixed a global PHP security issue", and drop any "we expect to be back by…".
+what people see in "Recent incidents"), e.g. "SparkLayer was offline due to a
+global PHP security issue", and drop any "we expect to be back by…". Say what
+happened to SparkLayer, not that we fixed someone else's problem.
 
 ## Start a new incident
 

@@ -1,11 +1,11 @@
 ---
-title: SparkLayer was offline while we fixed a global PHP security issue
+title: SparkLayer was offline due to a global PHP security issue
 impact: major
 affects: [frontend, dashboard, api: minor]
 # When the outage began, in UK time (e.g. 2026-10-21 14:30). Until it's set, the page says "First update" instead of "Started".
 # started: 2026-10-21 00:00
 ---
-SparkLayer was offline while we fixed a [critical security issue in PHP](https://www.ncsc.gov.uk/news/critical-security-issue-affecting-php) that affected a large part of the internet. We kept our services offline until the fix was in place and verified. We found no evidence that SparkLayer or your data was affected.
+SparkLayer was offline because of a [critical security issue in PHP](https://www.ncsc.gov.uk/news/critical-security-issue-affecting-php) that affected a large part of the internet. We kept our services offline until the security patch was installed and verified on our platform. We found no evidence that SparkLayer or your data was affected.
 
 ## 2026-10-22 10:55 · Resolved
 SparkLayer is back online, and all services are working normally.
