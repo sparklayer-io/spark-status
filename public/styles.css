@@ -234,22 +234,43 @@ svg {
 .incident-summary p:last-child {
   margin-bottom: 0;
 }
-.notice-foot {
+.notice-update {
+  margin: 14px 0 0 38px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.notice-update-head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin: 14px 0 0 38px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
+  gap: 4px 8px;
+  margin-bottom: 8px;
   font-size: 13px;
   color: var(--muted);
 }
-.notice-latest {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+.notice-update-head > span:first-child {
+  font-weight: 600;
+  color: var(--ink);
+}
+.notice-update-body {
+  font-size: 14.5px;
+}
+.notice-update-body p {
+  margin: 0 0 8px;
+}
+.notice-update-body p:last-child {
+  margin-bottom: 0;
+}
+.notice-update-body ul {
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+.notice-foot {
+  display: flex;
+  justify-content: flex-end;
+  margin: 12px 0 0 38px;
 }
 .notice-cta {
   font-weight: 600;
@@ -578,6 +599,7 @@ code {
     padding: 16px 18px;
   }
   .notice-body,
+  .notice-update,
   .notice-foot {
     margin-left: 0;
   }

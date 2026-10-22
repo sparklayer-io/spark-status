@@ -262,9 +262,18 @@ function incidentCard(i, services, now) {
     <p class="notice-meta">${names.length ? `Affects ${esc(names.join(', '))} · ` : ''}${i.startedKnown ? `Started ${when(i.started)} · ${ago(i.started, now)} ago` : `First update ${when(i.started)}`}</p>
   </div></div>
   ${i.summary ? `<div class="notice-body">${i.summary}</div>` : ''}
+  ${
+    latest
+      ? `<section class="notice-update" aria-label="Latest update">
+    <div class="notice-update-head"><span>Latest update</span> ${stateTag(latest.state)} ${when(latest.at)}</div>
+    <div class="notice-update-body">${latest.html}</div>
+  </section>`
+      : ''
+  }
   <div class="notice-foot">
-    ${latest ? `<span class="notice-latest">${stateTag(latest.state)} Latest update ${when(latest.at)}</span>` : ''}
-    <a class="notice-cta" href="incidents/${i.slug}/">Read all updates <span aria-hidden="true">→</span></a>
+    <a class="notice-cta" href="incidents/${i.slug}/">${
+      i.updates.length > 1 ? `See all ${i.updates.length} updates` : 'See the full update'
+    } <span aria-hidden="true">→</span></a>
   </div>
 </article>`;
 }
