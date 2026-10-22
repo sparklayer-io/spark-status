@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { md, overall, parseIncident, serviceStatus, ukTime } from '../scripts/lib.mjs';
+import { md, overall, parseIncident, previewText, serviceStatus, ukTime } from '../scripts/lib.mjs';
 
 const services = [
   { id: 'frontend', name: 'SparkLayer Frontend', description: '' },
@@ -71,4 +71,13 @@ test('update text: escaped, with bold, lists and safe links only', () => {
   assert.match(h, /<ul><li>one<\/li><li>two<\/li><\/ul>/);
   assert.match(h, /<a href="https:\/\/www.ncsc.gov.uk" target="_blank" rel="noopener noreferrer">NCSC<\/a>/);
   assert.doesNotMatch(h, /href="javascript/);
+});
+
+test('link previews use whole sentences of the summary, as plain text', () => {
+  const html = md('SparkLayer is offline. A [critical issue](https://x.io) affects **many** sites, and we’ve kept our services offline until a fix is verified. We’ve found no evidence your data was affected.');
+  const t = previewText(html);
+  assert.ok(t.length <= 300);
+  assert.ok(t.startsWith('SparkLayer is offline. A critical issue affects many sites'));
+  assert.ok(t.endsWith('.'));
+  assert.doesNotMatch(t, /<|\*\*/);
 });
