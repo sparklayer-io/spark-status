@@ -428,7 +428,7 @@ export function renderIncident(i, { services, now = new Date() }) {
       <p class="incident-kicker">${i.open ? (i.impact === 'major' ? 'Ongoing outage' : 'Ongoing issue') : 'Resolved'}</p>
       <h1>${esc(i.title)}</h1>
       <p class="incident-meta">
-        ${names.length ? `Affects <strong>${esc(names.join(', '))}</strong> · ` : ''}${i.startedKnown ? 'Started' : 'First update'} ${when(i.started)}${
+        ${names.length ? `${i.open ? 'Affects' : 'Affected'} <strong>${esc(names.join(', '))}</strong> · ` : ''}${i.startedKnown ? 'Started' : 'First update'} ${when(i.started)}${
           i.open
             ? i.startedKnown
               ? ` · ${ago(i.started, now)} so far`
