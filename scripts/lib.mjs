@@ -230,7 +230,14 @@ export const siteUrl = () =>
       : 'https://status.sparklayer.io')
   ).replace(/\/$/, '');
 
-function page({ title, description, body, root = '', path = '/' }) {
+/** Link previews (Slack, email, social) are the same on every page, whatever's happening. */
+const PREVIEW = {
+  title: 'SparkLayer Status',
+  description:
+    'Live status for SparkLayer. See whether your B2B store, Dashboard and API are working, with updates on any issues.',
+};
+
+function page({ title, body, root = '', path = '/' }) {
   const site = siteUrl();
   return `<!doctype html>
 <html lang="en-GB">
@@ -238,12 +245,12 @@ function page({ title, description, body, root = '', path = '/' }) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
-<meta name="description" content="${esc(description)}">
+<meta name="description" content="${esc(PREVIEW.description)}">
 <link rel="canonical" href="${site}${path}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SparkLayer Status">
-<meta property="og:title" content="${esc(title)}">
-<meta property="og:description" content="${esc(description)}">
+<meta property="og:title" content="${esc(PREVIEW.title)}">
+<meta property="og:description" content="${esc(PREVIEW.description)}">
 <meta property="og:url" content="${site}${path}">
 <meta property="og:image" content="${site}/og-image.jpg">
 <meta property="og:image:width" content="1114">
@@ -361,7 +368,6 @@ ${statuses
 </section>`;
   return page({
     title: level === 'ok' ? 'SparkLayer Status' : `${headline} · SparkLayer Status`,
-    description: 'Whether SparkLayer’s storefront, Dashboard and API are working, and updates on any incident.',
     body,
   });
 }
@@ -404,7 +410,6 @@ ${i.updates
 </article>`;
   return page({
     title: `${i.title} · SparkLayer Status`,
-    description: i.open ? `Ongoing: ${i.title}. Updates from SparkLayer.` : `Resolved: ${i.title}.`,
     body,
     root: '../../',
     path: `/incidents/${i.slug}/`,
