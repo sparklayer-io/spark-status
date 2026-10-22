@@ -7,8 +7,6 @@ affects: [frontend, dashboard, api: minor]
 ---
 SparkLayer is offline. A [critical security issue in PHP](https://www.ncsc.gov.uk/news/critical-security-issue-affecting-php) affects a large part of the internet, and we’ve kept our services offline until a fix is in place and verified. We’ve found no evidence that SparkLayer or your data has been affected.
 
-**Next update:** by 12pm UK time, or sooner if we’re back online.
-
 ## 2026-10-22 06:53 · Identified
 SparkLayer is still offline. Our hosting provider’s automatic security update still hasn’t been applied to our platform, so we’ve stopped waiting for it. Our engineering team is now moving SparkLayer onto infrastructure where we install the patched version of PHP ourselves and verify it before anything goes live. We won’t bring services back until that check is complete.
 
