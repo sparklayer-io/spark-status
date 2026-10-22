@@ -208,6 +208,15 @@ const ICON = {
   minor: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M10 5.2v5.6" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/><circle cx="10" cy="14.4" r="1.35" fill="#fff"/></svg>',
   major: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M6.6 6.6l6.8 6.8M13.4 6.6l-6.8 6.8" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/></svg>',
 };
+/** "SparkLayer Frontend, SparkLayer API (some issues)": a service at a different level says so. */
+const affectedNames = (i, services) =>
+  i.affects
+    .map(a => {
+      const name = services.find(s => s.id === a)?.name;
+      const own = i.levelOf?.[a];
+      return name && own && own !== i.impact ? `${name} (${LEVELS[own].word.toLowerCase()})` : name;
+    })
+    .filter(Boolean);
 const pill = level => `<span class="pill pill-${level}"><span class="dot"></span>${LEVELS[level].word}</span>`;
 const stateTag = s => `<span class="state state-${s.toLowerCase()}">${esc(s)}</span>`;
 
@@ -246,7 +255,7 @@ ${body}
 
 function incidentCard(i, services, now) {
   const latest = i.updates[0];
-  const names = i.affects.map(a => services.find(s => s.id === a)?.name).filter(Boolean);
+  const names = affectedNames(i, services);
   return `<article class="notice notice-${i.impact}">
   <div class="notice-head">${ICON[i.impact]}<div>
     <h2><a href="incidents/${i.slug}/">${esc(i.title)}</a></h2>
@@ -327,7 +336,7 @@ ${statuses
 }
 
 export function renderIncident(i, { services, now = new Date() }) {
-  const names = i.affects.map(a => services.find(s => s.id === a)?.name).filter(Boolean);
+  const names = affectedNames(i, services);
   const status = i.open ? i.impact : 'ok';
   const body = `
 <p class="crumb"><a href="../../">← All services</a></p>

@@ -119,8 +119,8 @@ svg {
   height: 28px;
 }
 .incident-head svg {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
 }
 .notice svg {
   width: 26px;
@@ -421,9 +421,9 @@ svg {
 }
 .incident-head {
   display: flex;
-  gap: 18px;
+  gap: 14px;
   align-items: flex-start;
-  padding: 26px 28px;
+  padding: 18px 22px;
   border-radius: var(--radius);
   border: 1px solid;
   box-shadow: var(--shadow);
@@ -442,19 +442,20 @@ svg {
 }
 .incident-kicker {
   margin: 0 0 2px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--muted);
 }
 .incident-head h1 {
-  font-size: 26px;
-  line-height: 1.25;
+  font-size: 20px;
+  line-height: 1.35;
+  font-weight: 600;
 }
 .incident-meta {
-  margin: 8px 0 0;
-  font-size: 14px;
+  margin: 6px 0 0;
+  font-size: 13.5px;
 }
 .incident-summary {
   margin: 18px 0 0;
@@ -559,14 +560,12 @@ code {
     height: 24px;
   }
   .incident-head svg {
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
   }
-  .hero h1 {
-    font-size: 17px;
-  }
+  .hero h1,
   .incident-head h1 {
-    font-size: 21px;
+    font-size: 17px;
   }
   .service {
     flex-direction: column;
