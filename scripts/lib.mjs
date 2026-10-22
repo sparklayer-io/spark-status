@@ -23,6 +23,9 @@ export const LEVELS = {
 const IMPACT = { minor: 'minor', major: 'major', degraded: 'minor', outage: 'major' };
 export const STATES = ['Investigating', 'Identified', 'Update', 'Monitoring', 'Resolved'];
 
+/** Links that leave the status page open in a new tab. */
+const NEW_TAB = ' target="_blank" rel="noopener noreferrer"';
+
 const esc = s =>
   String(s ?? '').replace(
     /[&<>"']/g,
@@ -82,10 +85,8 @@ export function md(text) {
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/(^|[^*])\*(?!\s)(.+?)\*/g, '$1<em>$2</em>')
       .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(
-        /\[([^\]]+)\]\((https?:\/\/[^)\s]+|mailto:[^)\s]+)\)/g,
-        '<a href="$2" rel="noopener">$1</a>',
-      );
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, `<a href="$2"${NEW_TAB}>$1</a>`)
+      .replace(/\[([^\]]+)\]\((mailto:[^)\s]+)\)/g, '<a href="$2">$1</a>');
   const out = [];
   for (const block of String(text).trim().split(/\n\s*\n/)) {
     const lines = block.split('\n').map(l => l.trimEnd());
@@ -210,14 +211,14 @@ function page({ title, description, body, root = '' }) {
 <div class="bar" aria-hidden="true"></div>
 <header class="wrap top">
   <a class="brand" href="${root || './'}"><img src="${root}logo-dark.png" alt="SparkLayer" width="534" height="117"><span>Status</span></a>
-  <a class="help" href="https://docs.sparklayer.io/help/support" rel="noopener">Contact support</a>
+  <a class="help" href="https://docs.sparklayer.io/help/support"${NEW_TAB}>Contact support</a>
 </header>
 <main class="wrap">
 ${body}
 </main>
 <footer class="wrap foot">
   <span>© ${new Date().getFullYear()} SparkLayer</span>
-  <span>Times are shown in your time zone. <a href="https://www.sparklayer.io" rel="noopener">sparklayer.io</a></span>
+  <span>Times are shown in your time zone. <a href="https://www.sparklayer.io"${NEW_TAB}>sparklayer.io</a></span>
 </footer>
 <script src="${root}local-time.js" defer></script>
 </body>
@@ -341,7 +342,7 @@ ${i.updates
   )
   .join('\n')}
   </ol>
-  <p class="incident-foot">We post an update whenever anything changes${i.open ? ', and at least every few hours until it’s fixed' : ''}. Questions? <a href="https://docs.sparklayer.io/help/support" rel="noopener">Contact support</a>.</p>
+  <p class="incident-foot">We post an update whenever anything changes${i.open ? ', and at least every few hours until it’s fixed' : ''}. Questions? <a href="https://docs.sparklayer.io/help/support"${NEW_TAB}>Contact support</a>.</p>
 </article>`;
   return page({
     title: `${i.title} · SparkLayer Status`,

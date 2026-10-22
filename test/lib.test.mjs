@@ -59,6 +59,6 @@ test('update text: escaped, with bold, lists and safe links only', () => {
   const h = md('**Next update:** soon <script>\n\n- one\n- two\n\n[NCSC](https://www.ncsc.gov.uk) [bad](javascript:alert(1))');
   assert.match(h, /<strong>Next update:<\/strong> soon &lt;script&gt;/);
   assert.match(h, /<ul><li>one<\/li><li>two<\/li><\/ul>/);
-  assert.match(h, /<a href="https:\/\/www.ncsc.gov.uk" rel="noopener">NCSC<\/a>/);
+  assert.match(h, /<a href="https:\/\/www.ncsc.gov.uk" target="_blank" rel="noopener noreferrer">NCSC<\/a>/);
   assert.doesNotMatch(h, /href="javascript/);
 });
