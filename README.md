@@ -31,13 +31,18 @@ then **Commit changes** to `main`. The page is live again within a minute.
 
 ## Close an incident
 
-Add a final section marked `Resolved`. The services go back to green and the
-incident moves to "Recent incidents" (shown for 30 days):
+Add a final section marked `Resolved`. The services go back to green, the
+headline says everything is running smoothly, and the incident moves to
+"Recent incidents" (shown for 30 days) with all its updates kept:
 
 ```markdown
 ## 2026-10-22 13:10 · Resolved
 Everything is working normally again. Thank you for your patience.
 ```
+
+In the same edit, put the **title and summary in the past tense** (they're
+what people see in "Recent incidents"), e.g. "SparkLayer was offline while we
+fixed a global PHP security issue", and drop any "we expect to be back by…".
 
 ## Start a new incident
 
