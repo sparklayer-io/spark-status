@@ -43,6 +43,7 @@ h1,
 h2,
 h3 {
   color: var(--ink);
+  font-weight: 600;
   letter-spacing: -0.015em;
   margin: 0;
 }
