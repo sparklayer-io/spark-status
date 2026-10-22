@@ -5,7 +5,20 @@ affects: [frontend, dashboard, api: minor]
 # When the outage began, in UK time (e.g. 2026-10-21 14:30). Until it's set, the page says "First update" instead of "Started".
 # started: 2026-10-21 00:00
 ---
-SparkLayer is offline. A [critical security issue in PHP](https://www.ncsc.gov.uk/news/critical-security-issue-affecting-php) affects a large part of the internet, and we’ve kept our services offline until a fix is in place and verified. We’ve found no evidence that SparkLayer or your data has been affected.
+SparkLayer is offline. A [critical security issue in PHP](https://www.ncsc.gov.uk/news/critical-security-issue-affecting-php) affects a large part of the internet, and we’ve kept our services offline until a fix is in place and verified. We’ve found no evidence that SparkLayer or your data has been affected. We expect to be back online before 12pm UK time.
+
+## 2026-10-22 09:09 · Update
+Our engineering team has made good progress overnight. We’re migrating SparkLayer to updated infrastructure with the security fix in place, and we expect to be back online before 12pm UK time. If we’re back sooner, we’ll post here straight away.
+
+We’re testing everything, including checkout, quick order and pricing, before we switch services back on, so you can rely on SparkLayer as soon as it’s live.
+
+**Your data**
+We’ve found no evidence that SparkLayer or your data has been affected at any point.
+
+**In the meantime**
+You can still take orders through Shopify. In your Shopify admin, go to **Orders → Create order**, add the products and apply your B2B prices, then use **Send invoice**. Our support team is available at [support@sparklayer.io](mailto:support@sparklayer.io) to help.
+
+Thank you for your patience. We know this has been a long wait.
 
 ## 2026-10-22 06:53 · Identified
 SparkLayer is still offline. Our hosting provider’s automatic security update still hasn’t been applied to our platform, so we’ve stopped waiting for it. Our engineering team is now moving SparkLayer onto infrastructure where we install the patched version of PHP ourselves and verify it before anything goes live. We won’t bring services back until that check is complete.
