@@ -7,17 +7,17 @@ export const LEVELS = {
   ok: {
     rank: 0,
     word: 'Working normally',
-    headline: 'Everything is working normally',
+    headline: 'Everything is running smoothly',
   },
   minor: {
     rank: 1,
     word: 'Some issues',
-    headline: 'Some services have issues',
+    headline: 'Some SparkLayer services aren’t working quite right',
   },
   major: {
     rank: 2,
     word: 'Not working',
-    headline: 'We’re having an outage',
+    headline: 'Some SparkLayer services are temporarily unavailable',
   },
 };
 const IMPACT = { minor: 'minor', major: 'major', degraded: 'minor', outage: 'major' };
@@ -249,17 +249,21 @@ export function renderHome({ services, incidents, now = new Date(), pastDays = 3
     .filter(i => !i.open && i.resolvedAt && now - i.resolvedAt < pastDays * 86400000)
     .sort((a, b) => b.resolvedAt - a.resolvedAt);
   const lastChange = incidents.flatMap(i => i.updates.map(u => u.at)).filter(Boolean).sort((a, b) => b - a)[0];
+  const headline =
+    level === 'major' && statuses.every(s => s.level === 'major')
+      ? 'SparkLayer is temporarily unavailable'
+      : LEVELS[level].headline;
 
   const body = `
 <section class="hero hero-${level}">
   ${ICON[level]}
   <div>
-    <h1>${LEVELS[level].headline}</h1>
+    <h1>${headline}</h1>
     <p>${
       level === 'ok'
-        ? 'All SparkLayer services are running as expected.'
-        : 'We know about it and we’re working on it. Updates are posted below as soon as we have them.'
-    }${lastChange ? ` Last updated ${when(lastChange)}.` : ''}</p>
+        ? 'All SparkLayer services are working as expected.'
+        : 'We’re sorry for the disruption. Our team is working on it, and the latest update is just below.'
+    }${lastChange ? ` <span class="hero-updated">Last updated ${when(lastChange)}</span>` : ''}</p>
   </div>
 </section>
 
@@ -297,7 +301,7 @@ ${statuses
   }
 </section>`;
   return page({
-    title: level === 'ok' ? 'SparkLayer Status' : `${LEVELS[level].headline} · SparkLayer Status`,
+    title: level === 'ok' ? 'SparkLayer Status' : `${headline} · SparkLayer Status`,
     description: 'Whether SparkLayer’s storefront, Dashboard and API are working, and updates on any incident.',
     body,
   });

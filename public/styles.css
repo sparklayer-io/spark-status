@@ -114,10 +114,13 @@ h3 {
 svg {
   flex: none;
 }
-.hero svg,
+.hero svg {
+  width: 28px;
+  height: 28px;
+}
 .incident-head svg {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
 }
 .notice svg {
   width: 26px;
@@ -142,20 +145,27 @@ svg {
 /* The headline */
 .hero {
   display: flex;
-  gap: 18px;
+  gap: 14px;
   align-items: flex-start;
-  padding: 26px 28px;
+  padding: 18px 22px;
   border-radius: var(--radius);
   border: 1px solid;
   box-shadow: var(--shadow);
 }
 .hero h1 {
-  font-size: 26px;
-  line-height: 1.25;
-  font-weight: 700;
+  font-size: 19px;
+  line-height: 1.4;
+  font-weight: 600;
 }
 .hero p {
-  margin: 6px 0 0;
+  margin: 3px 0 0;
+  font-size: 14.5px;
+}
+.hero-updated {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--muted);
 }
 .hero-ok {
   background: var(--ok-bg);
@@ -544,12 +554,17 @@ code {
     padding: 20px;
     gap: 14px;
   }
-  .hero svg,
-  .incident-head svg {
-    width: 32px;
-    height: 32px;
+  .hero svg {
+    width: 24px;
+    height: 24px;
   }
-  .hero h1,
+  .incident-head svg {
+    width: 30px;
+    height: 30px;
+  }
+  .hero h1 {
+    font-size: 17px;
+  }
   .incident-head h1 {
     font-size: 21px;
   }
