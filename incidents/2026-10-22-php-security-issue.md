@@ -1,7 +1,7 @@
 ---
 title: SparkLayer is offline while we fix a global PHP security issue
 impact: major
-affects: [all]
+affects: [frontend, dashboard, api: minor]
 # When the outage began, in UK time (e.g. 2026-10-21 14:30). Until it's set, the page says "First update" instead of "Started".
 # started: 2026-10-21 00:00
 ---

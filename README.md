@@ -48,7 +48,8 @@ becomes its web address) and fill it in:
 ---
 title: Checkout is slow for some stores
 impact: minor              # minor = amber, major = red
-affects: [frontend]        # frontend, dashboard, api, or all
+affects: [frontend]        # frontend, dashboard, api, or all; give one its own
+                           # level with e.g. [frontend, dashboard, api: minor]
 started: 2026-10-22 09:30  # optional, UK time; otherwise "First update" is shown
 ---
 What customers will notice, in a sentence or two.

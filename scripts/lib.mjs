@@ -110,10 +110,25 @@ export function parseIncident(text, slug, serviceIds) {
   if (!title) errors.push('missing "title"');
   const impact = IMPACT[String(data.impact ?? '').toLowerCase()];
   if (!impact) errors.push('"impact" must be minor or major');
-  let affects = Array.isArray(data.affects) ? data.affects : data.affects ? [data.affects] : [];
-  affects = affects.map(a => String(a).toLowerCase());
-  if (affects.includes('all')) affects = [...serviceIds];
-  for (const a of affects) if (!serviceIds.includes(a)) errors.push(`unknown service "${a}" in affects`);
+  // affects: [frontend, dashboard, api: minor]: a service can have its own
+  // level; the rest take the incident's impact. "all" means every service.
+  const listed = Array.isArray(data.affects) ? data.affects : data.affects ? [data.affects] : [];
+  const levelOf = {};
+  for (const raw of listed) {
+    const [name, own] = String(raw).toLowerCase().split(':').map(x => x.trim());
+    const level = own ? IMPACT[own] : impact;
+    if (own && !IMPACT[own]) errors.push(`"${raw}" in affects: the level must be minor or major`);
+    if (name === 'all') {
+      for (const id of serviceIds) levelOf[id] ??= level ?? 'minor';
+    } else if (!serviceIds.includes(name)) errors.push(`unknown service "${name}" in affects`);
+    else levelOf[name] = level ?? 'minor';
+  }
+  // A service named on its own overrides "all".
+  for (const raw of listed) {
+    const [name, own] = String(raw).toLowerCase().split(':').map(x => x.trim());
+    if (name !== 'all' && serviceIds.includes(name)) levelOf[name] = (own ? IMPACT[own] : impact) ?? 'minor';
+  }
+  const affects = serviceIds.filter(id => levelOf[id]);
 
   const [summary, ...sections] = body.split(/^## /m);
   const updates = sections.map(sec => {
@@ -134,6 +149,8 @@ export function parseIncident(text, slug, serviceIds) {
     title,
     impact: impact ?? 'minor',
     affects,
+    /** Each affected service's level (minor or major). */
+    levelOf,
     summary: md(summary),
     updates,
     started,
@@ -150,7 +167,8 @@ export function serviceStatus(services, incidents) {
   const open = incidents.filter(i => i.open);
   return services.map(s => {
     const hits = open.filter(i => i.affects.includes(s.id));
-    const level = hits.some(i => i.impact === 'major') ? 'major' : hits.length ? 'minor' : 'ok';
+    const levels = hits.map(i => i.levelOf?.[s.id] ?? i.impact);
+    const level = levels.includes('major') ? 'major' : levels.length ? 'minor' : 'ok';
     return { ...s, level, incidents: hits };
   });
 }

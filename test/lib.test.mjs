@@ -55,6 +55,16 @@ test('each service takes the worst open incident affecting it', () => {
   assert.equal(overall(serviceStatus(services, [over])), 'ok');
 });
 
+test('a service can have its own level in affects', () => {
+  const i = parseIncident(file('title: Down\nimpact: major\naffects: [frontend, dashboard, api: minor]', '## 2026-10-22 09:00 · Identified\nA.'), 'd', ids);
+  assert.deepEqual(i.errors, []);
+  assert.deepEqual(serviceStatus(services, [i]).map(x => x.level), ['major', 'major', 'minor']);
+  const all = parseIncident(file('title: Down\nimpact: major\naffects: [all, api: minor]', '## 2026-10-22 09:00 · Identified\nA.'), 'e', ids);
+  assert.deepEqual(serviceStatus(services, [all]).map(x => x.level), ['major', 'major', 'minor']);
+  const bad = parseIncident(file('title: Down\nimpact: major\naffects: [api: sideways]', '## 2026-10-22 09:00 · Identified\nA.'), 'f', ids);
+  assert.ok(bad.errors.some(e => e.includes('minor or major')));
+});
+
 test('update text: escaped, with bold, lists and safe links only', () => {
   const h = md('**Next update:** soon <script>\n\n- one\n- two\n\n[NCSC](https://www.ncsc.gov.uk) [bad](javascript:alert(1))');
   assert.match(h, /<strong>Next update:<\/strong> soon &lt;script&gt;/);

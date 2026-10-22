@@ -3,7 +3,8 @@
 title: Checkout is slow for some stores
 # minor = amber ("Some issues"), major = red ("Not working")
 impact: minor
-# Which services it affects: frontend, dashboard, api, or all
+# Which services it affects: frontend, dashboard, api, or all. A service can
+# have its own level, e.g. [frontend, dashboard, api: minor]
 affects: [frontend]
 ---
 A sentence or two for the home page: what customers will notice, in plain words.
