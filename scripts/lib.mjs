@@ -217,27 +217,6 @@ const affectedNames = (i, services) =>
       return name && own && own !== i.impact ? `${name} (${LEVELS[own].word.toLowerCase()})` : name;
     })
     .filter(Boolean);
-/** An incident’s summary as plain text for link previews: whole sentences, up to ~300 characters. */
-export function previewText(html, max = 300) {
-  const text = String(html)
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/\s+/g, ' ')
-    .trim();
-  if (text.length <= max) return text;
-  const sentences = text.match(/[^.!?]+[.!?]+(\s|$)/g) ?? [];
-  let out = '';
-  for (const s of sentences) {
-    if ((out + s).trim().length > max) break;
-    out += s;
-  }
-  return out.trim() || `${text.slice(0, max - 1).trimEnd()}…`;
-}
-
 const pill = level => `<span class="pill pill-${level}"><span class="dot"></span>${LEVELS[level].word}</span>`;
 const stateTag = s => `<span class="state state-${s.toLowerCase()}">${esc(s)}</span>`;
 
@@ -382,10 +361,7 @@ ${statuses
 </section>`;
   return page({
     title: level === 'ok' ? 'SparkLayer Status' : `${headline} · SparkLayer Status`,
-    // Link previews (Slack, email, social): what's happening, in the customer's terms.
-    description: open.length
-      ? `${previewText(open[0].summary)} Live updates on this page.`
-      : 'SparkLayer is working normally. Check here any time to see whether your B2B store, Dashboard and API are running, with live updates if anything goes wrong.',
+    description: 'Whether SparkLayer’s storefront, Dashboard and API are working, and updates on any incident.',
     body,
   });
 }
@@ -428,9 +404,7 @@ ${i.updates
 </article>`;
   return page({
     title: `${i.title} · SparkLayer Status`,
-    description: i.open
-      ? `${previewText(i.summary)} Live updates on this page.`
-      : `Resolved ${UK.format(i.resolvedAt ?? new Date())}. ${previewText(i.summary)}`,
+    description: i.open ? `Ongoing: ${i.title}. Updates from SparkLayer.` : `Resolved: ${i.title}.`,
     body,
     root: '../../',
     path: `/incidents/${i.slug}/`,
